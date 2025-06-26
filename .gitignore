@@ -1,2 +1,6 @@
+# Misc. Python
 __pycache__
 venv/
+
+# SQLite database
+url_shortener.db
