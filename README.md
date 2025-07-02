@@ -10,4 +10,4 @@
 3. Install the dependencies via `$ pip install -r requirements.txt`
 
 ### How to run:
-`$ flask --app ./app/main.py run`
+`$ flask --app ./app/backend/main.py run`
