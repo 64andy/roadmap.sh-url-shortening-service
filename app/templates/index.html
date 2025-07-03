@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Shortening Service</title>
+  <link rel="stylesheet" href="/static/index.css" />
+</head>
+<body id="root">
+  <div id="root">
+    <h1>URL Shortening Service</h1>
+    <p className="tab-selector">
+      <button onclick="setTab(0)">Create</button>
+      <button onclick="setTab(1)">Get</button>
+      <button onclick="setTab(2)">Edit</button>
+      <button onclick="setTab(3)">Delete</button>
+      <button onclick="setTab(4)">Full Stats</button>
+    </p>
+    <p>
+      <label for="url">URL: </label>
+      <input type="url" name="url" id="url" />
+    </p>
+    <div id="all-pages">
+      <!-- Create new URL-->
+      <div class="page" data-id=0>
+        <button onclick="Actions.createNewURL()">Go</button>
+      </div>
+      <!-- Get URL -->
+      <div class="page hidden" data-id=1>
+        NOT IMPLMEMENTED
+      </div>
+      <!-- Edit URL-->
+      <div class="page hidden" data-id=2>
+        NOT IMPLMEMENTED
+      </div>
+      <!-- Delete URL -->
+      <div class="page hidden" data-id=3>
+        NOT IMPLMEMENTED
+      </div>
+      <!-- Get full stats -->
+      <div class="page hidden" data-id=4>
+        NOT IMPLMEMENTED
+      </div>
+    </div>
+    <pre id="output">
+      After sending a request, the output goes here
+    </pre>
+  </div>
+
+  <script>
+    // Front-end helper
+    function getUrl() {
+      const elem = document.getElementById('url');
+      if (elem === undefined) {
+        alert("I CAN'T FIND THE URL INPUT, FIX MEEEEE!!!");
+        throw new Exception();
+      }
+      if (elem.checkValidity()) {
+        return elem.value;
+      }
+      display('Malformed URL, plz fix');
+      throw new Exception('Malformed URL');
+    }
+
+    function setTab(id) {
+      for (const elem of document.getElementsByClassName('page')) {
+        if (elem.dataset.id == id) {
+          elem.classList.remove('hidden');
+        } else {
+          elem.classList.add('hidden');
+        }
+      }
+    }
+    function display(text) {
+      document.getElementById('output').textContent = text;
+    }
+
+    class Actions {
+      static async createNewURL() {
+        const url = getUrl();
+        const res = await fetch('/shorten', {
+          method: 'POST',
+          body: JSON.stringify({'url': getUrl()})
+        });
+        if (res.status !== 201) {
+          display(`Error ${res.status}: ${await res.text()}`)
+          return;
+        }
+
+        display(await JSON.stringify(await res.json(), undefined, 2));
+      }
+    }
+
+
+
+  </script>
+</body>
+</html>

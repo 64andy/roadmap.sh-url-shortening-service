@@ -29,8 +29,8 @@ class ShortenedURL(db.Model):
             'id':       str(self.id),
             'url':      self.url,
             'shortCode':self.code,
-            'createdAt':self.created_at.strftime(r"%y-%m-%dT%H:%M:%SZ"),
-            'updatedAt':self.updated_at.strftime(r"%y-%m-%dT%H:%M:%SZ"),
+            'createdAt':self.created_at.strftime(r"%Y-%m-%dT%H:%M:%SZ"),
+            'updatedAt':self.updated_at.strftime(r"%Y-%m-%dT%H:%M:%SZ"),
         }
     
     def info_dict_full(self) -> dict:
@@ -38,7 +38,7 @@ class ShortenedURL(db.Model):
     
     @staticmethod
     def find_by_code(code: str) -> 'ShortenedURL | None':
-        return db.session.query(db.select(ShortenedURL).where(ShortenedURL.code == code)).scalar()
+        return db.session.execute(db.select(ShortenedURL).where(ShortenedURL.code == code)).scalar()
     
     @staticmethod
     def find_by_code_or_404(code: str) -> 'ShortenedURL':

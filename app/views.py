@@ -135,6 +135,7 @@ def update_short_url(code: str):
 
     return jsonify(shortened.info_dict())
 
+
 @app.delete('/shorten/<code>')
 def delete_short_url(code: str):
     """Endpoint.
@@ -154,6 +155,7 @@ def delete_short_url(code: str):
     shortened = ShortenedURL.find_by_code_or_404(code)
     db.session.delete(shortened)
     return 'Successfully deleted', 204
+
 
 @app.get('/shortened/<code>/stats')
 def get_url_statistics(code: str):
