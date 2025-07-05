@@ -6,7 +6,7 @@
   <title>URL Shortening Service</title>
   <link rel="stylesheet" href="/static/index.css" />
 </head>
-<body id="root">
+<body>
   <div id="root">
     <h1>URL Shortening Service</h1>
     <p className="tab-selector">
@@ -19,27 +19,29 @@
     <p>
       <label for="url">URL: </label>
       <input type="url" name="url" id="url" />
+      <label for="code">Code: </label>
+      <input type="text" name="code" id="code" maxlength=6 />
     </p>
     <div id="all-pages">
       <!-- Create new URL-->
-      <div class="page" data-id=0>
-        <button onclick="Actions.createNewURL()">Go</button>
+      <div class="page" data-id=0 data-uses-url>
+        <button onclick="Actions.createNewURL()">Create Shortened URL</button>
       </div>
       <!-- Get URL -->
-      <div class="page hidden" data-id=1>
-        NOT IMPLMEMENTED
+      <div class="page" data-id=1 data-uses-code>
+        NOT IMPLEMENTED
       </div>
       <!-- Edit URL-->
-      <div class="page hidden" data-id=2>
-        NOT IMPLMEMENTED
+      <div class="page" data-id=2 data-uses-url data-uses-code>
+        NOT IMPLEMENTED
       </div>
       <!-- Delete URL -->
-      <div class="page hidden" data-id=3>
-        NOT IMPLMEMENTED
+      <div class="page" data-id=3 data-uses-code>
+        NOT IMPLEMENTED
       </div>
       <!-- Get full stats -->
-      <div class="page hidden" data-id=4>
-        NOT IMPLMEMENTED
+      <div class="page" data-id=4 data-uses-code>
+        NOT IMPLEMENTED
       </div>
     </div>
     <pre id="output">
@@ -48,31 +50,64 @@
   </div>
 
   <script>
-    // Front-end helper
+    // Front-end helpers
+    // Relevant page elements
+    /** @type {HTMLInputElement} URL_INPUT
+     * The input field for entering a URL*/
+    const URL_INPUT = document.getElementById('url') || panic("I can't find the URL input");
+    /** @type {HTMLInputElement} 
+     * The input field for entering the shortened URL's code */
+    const CODE_INPUT = document.getElementById('code') || panic("I can't find the code input");
+    /** @type {HTMLElement} */
+    const DISP = document.getElementById('output') || panic("Can't find the display");
+    /** @type {Map<number, HTMLElement>} PAGES 
+     * The pages displayed when selecting tabs */
+    const PAGES = new Map();
+    for (const e of document.getElementsByClassName('page')) {
+      const pos = parseInt(e.dataset.id);
+      if (pos === undefined) panic('A page is missing a "data-id"');
+      PAGES.set(pos, e);
+    }
+
+
+    /**
+     * Halts execution with an alert and console log
+     * @param {string} msg
+     * @return {never}
+     */
+    function panic(msg) {
+      console.error(msg);
+      alert(msg);
+      throw new Error(msg);
+    }
+
     function getUrl() {
-      const elem = document.getElementById('url');
-      if (elem === undefined) {
-        alert("I CAN'T FIND THE URL INPUT, FIX MEEEEE!!!");
-        throw new Exception();
-      }
-      if (elem.checkValidity()) {
+      if (URL_INPUT.checkValidity()) {
         return elem.value;
       }
-      display('Malformed URL, plz fix');
-      throw new Exception('Malformed URL');
+      panic('Malformed URL, plz fix');
+    }
+
+    function getCode() {
+      if (CODE_INPUT.checkValidity()) {
+        return elem.value;
+      }
+      panic('Code must be 6-characters long with ONLY numbers and upper/lowercase letters');
     }
 
     function setTab(id) {
-      for (const elem of document.getElementsByClassName('page')) {
-        if (elem.dataset.id == id) {
-          elem.classList.remove('hidden');
-        } else {
-          elem.classList.add('hidden');
-        }
-      }
+      // Hide all pages except the selected one
+      const correctPage = PAGES.get(id) || panic(`No page has data-id=${id}`);
+      PAGES.forEach(e => e.classList.add('hidden'));
+      correctPage.classList.remove('hidden');
+      // Activate the relevant inputs
+      URL_INPUT.disabled = !correctPage.hasAttribute('data-uses-url');
+      CODE_INPUT.disabled = !correctPage.hasAttribute('data-uses-code');
+      console.log(URL_INPUT.disabled,CODE_INPUT.disabled)
     }
+
     function display(text) {
-      document.getElementById('output').textContent = text;
+      DISP.textContent = text;
     }
 
     class Actions {
@@ -91,7 +126,8 @@
       }
     }
 
-
+    // Main
+    setTab(0);
 
   </script>
 </body>
