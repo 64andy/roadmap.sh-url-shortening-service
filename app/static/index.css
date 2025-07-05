@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
@@ -60,6 +60,7 @@ button {
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -68,4 +69,33 @@ button:focus-visible {
 #output {
   background-color: black;
   text-align: left;
+}
+
+.tab-selector {
+  display: flex;
+  flex-direction: column;
+  max-width: 5em;
+}
+
+.tab {
+  border-color: black;
+}
+
+.content {
+  /* background-color: darkslategrey; */
+  display: flex;
+  flex-direction: row;
+}
+
+.page {
+  /* background-color: darkblue; */
+}
+
+.inputs {
+  /* background-color: darkred; */
+}
+
+.inner-rhs {
+  /* background-color: darksalmon; */
+  padding-left: 1em;
 }
