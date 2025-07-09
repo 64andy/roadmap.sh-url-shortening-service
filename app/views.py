@@ -154,10 +154,11 @@ def delete_short_url(code: str):
     """
     shortened = ShortenedURL.find_by_code_or_404(code)
     db.session.delete(shortened)
+    db.session.commit()
     return 'Successfully deleted', 204
 
 
-@app.get('/shortened/<code>/stats')
+@app.get('/shorten/<code>/stats')
 def get_url_statistics(code: str):
     """Endpoint.
 

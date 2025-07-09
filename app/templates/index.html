@@ -9,40 +9,44 @@
 <body>
   <div id="root">
     <h1>URL Shortening Service</h1>
-    <p className="tab-selector">
-      <button onclick="setTab(0)">Create</button>
-      <button onclick="setTab(1)">Get</button>
-      <button onclick="setTab(2)">Edit</button>
-      <button onclick="setTab(3)">Delete</button>
-      <button onclick="setTab(4)">Full Stats</button>
-    </p>
-    <p>
-      <label for="url">URL: </label>
-      <input type="url" name="url" id="url" />
-      <label for="code">Code: </label>
-      <input type="text" name="code" id="code" maxlength=6 />
-    </p>
-    <div id="all-pages">
-      <!-- Create new URL-->
-      <div class="page" data-id=0 data-uses-url>
-        <button onclick="Actions.createNewURL()">Create Shortened URL</button>
-      </div>
-      <!-- Get URL -->
-      <div class="page" data-id=1 data-uses-code>
-        NOT IMPLEMENTED
-      </div>
-      <!-- Edit URL-->
-      <div class="page" data-id=2 data-uses-url data-uses-code>
-        NOT IMPLEMENTED
-      </div>
-      <!-- Delete URL -->
-      <div class="page" data-id=3 data-uses-code>
-        NOT IMPLEMENTED
-      </div>
-      <!-- Get full stats -->
-      <div class="page" data-id=4 data-uses-code>
-        NOT IMPLEMENTED
-      </div>
+    <div class="content">
+      <p class="tab-selector">
+        <button class="tab" onclick="setTab(0)">Create</button>
+        <button class="tab" onclick="setTab(1)">Get</button>
+        <button class="tab" onclick="setTab(2)">Edit</button>
+        <button class="tab" onclick="setTab(3)">Delete</button>
+        <button class="tab" onclick="setTab(4)">Full Stats</button>
+      </p>
+      <div class="inner-rhs">
+        <p class="inputs">
+          <label for="url">URL: </label>
+          <input type="url" name="url" id="url" />
+          <label for="code">Code: </label>
+          <input type="text" name="code" id="code" maxlength=6 />
+        </p>
+        <div id="all-pages">
+          <!-- Create new URL-->
+          <div class="page" data-id=0 data-uses-url>
+            <button onclick="Actions.createNewURL()">Create Shortened URL</button>
+          </div>
+          <!-- Get URL -->
+          <div class="page" data-id=1 data-uses-code>
+            <button onclick="Actions.getURL()">Get URL From Code</button>
+          </div>
+          <!-- Edit URL-->
+          <div class="page" data-id=2 data-uses-url data-uses-code>
+            <button onclick="Actions.editURL()">Edit URL</button>
+          </div>
+          <!-- Delete URL -->
+          <div class="page" data-id=3 data-uses-code>
+            <button onclick="Actions.deleteURL()">Delete Shortened URL</button>
+          </div>
+          <!-- Get full stats -->
+          <div class="page" data-id=4 data-uses-code>
+            <button onclick="Actions.getFullURLStats()">Get Full URL Stats</button>
+          </div>
+        </div>
+      </div>  
     </div>
     <pre id="output">
       After sending a request, the output goes here
@@ -83,14 +87,14 @@
 
     function getUrl() {
       if (URL_INPUT.checkValidity()) {
-        return elem.value;
+        return URL_INPUT.value;
       }
       panic('Malformed URL, plz fix');
     }
 
     function getCode() {
       if (CODE_INPUT.checkValidity()) {
-        return elem.value;
+        return CODE_INPUT.value;
       }
       panic('Code must be 6-characters long with ONLY numbers and upper/lowercase letters');
     }
@@ -103,7 +107,6 @@
       // Activate the relevant inputs
       URL_INPUT.disabled = !correctPage.hasAttribute('data-uses-url');
       CODE_INPUT.disabled = !correctPage.hasAttribute('data-uses-code');
-      console.log(URL_INPUT.disabled,CODE_INPUT.disabled)
     }
 
     function display(text) {
@@ -115,7 +118,7 @@
         const url = getUrl();
         const res = await fetch('/shorten', {
           method: 'POST',
-          body: JSON.stringify({'url': getUrl()})
+          body: JSON.stringify({'url': url})
         });
         if (res.status !== 201) {
           display(`Error ${res.status}: ${await res.text()}`)
@@ -124,6 +127,57 @@
 
         display(await JSON.stringify(await res.json(), undefined, 2));
       }
+      static async getURL() {
+        const code = getCode();
+        const res = await fetch('/shorten/' + code, {
+          method: 'GET'
+        });
+        if (res.status !== 200) {
+          display(`Error ${res.status}: ${await res.text()}`)
+          return;
+        }
+
+        display(await JSON.stringify(await res.json(), undefined, 2));
+      }
+      static async editURL() {
+        const url = getUrl();
+        const code = getCode();
+        const res = await fetch('/shorten/' + code, {
+          method: 'PUT',
+          body: JSON.stringify({'url': getUrl()})
+        });
+        if (res.status !== 200) {
+          display(`Error ${res.status}: ${await res.text()}`)
+          return;
+        }
+
+        display(await JSON.stringify(await res.json(), undefined, 2));
+      }
+      static async deleteURL() {
+        const code = getCode();
+        const res = await fetch('/shorten/' + code, {
+          method: 'DELETE'
+        });
+        if (res.status !== 204) {
+          display(`Error ${res.status}: ${await res.text()}`)
+          return;
+        }
+        display('Successfully deleted for code ' + code);
+      }
+
+      static async getFullURLStats() {
+        const code = getCode();
+        const res = await fetch(`/shorten/${code}/stats`, {
+          method: 'GET'
+        });
+        if (res.status !== 200) {
+          display(`Error ${res.status}: ${await res.text()}`)
+          return;
+        }
+
+        display(await JSON.stringify(await res.json(), undefined, 2))
+      }
+
     }
 
     // Main
