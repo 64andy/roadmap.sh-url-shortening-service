@@ -54,6 +54,17 @@
   </div>
 
   <script>
+    /**
+     * Halts execution with an alert and console log
+     * @param {string} msg
+     * @return {never}
+     */
+    function panic(msg) {
+      console.error(msg);
+      alert(msg);
+      throw new Error(msg);
+    }
+
     // Front-end helpers
     // Relevant page elements
     /** @type {HTMLInputElement} URL_INPUT
@@ -69,21 +80,10 @@
     const PAGES = new Map();
     for (const e of document.getElementsByClassName('page')) {
       const pos = parseInt(e.dataset.id);
-      if (pos === undefined) panic('A page is missing a "data-id"');
+      if (pos === undefined) panic(`A [class="page"] is missing its "data-id" attribute`);
       PAGES.set(pos, e);
     }
 
-
-    /**
-     * Halts execution with an alert and console log
-     * @param {string} msg
-     * @return {never}
-     */
-    function panic(msg) {
-      console.error(msg);
-      alert(msg);
-      throw new Error(msg);
-    }
 
     function getUrl() {
       if (URL_INPUT.checkValidity()) {
@@ -101,7 +101,7 @@
 
     function setTab(id) {
       // Hide all pages except the selected one
-      const correctPage = PAGES.get(id) || panic(`No page has data-id=${id}`);
+      const correctPage = PAGES.get(id) || panic(`Can't find a [class="page"] where [data-id=${id}]`);
       PAGES.forEach(e => e.classList.add('hidden'));
       correctPage.classList.remove('hidden');
       // Activate the relevant inputs
